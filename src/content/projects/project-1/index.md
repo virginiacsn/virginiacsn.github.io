@@ -2,6 +2,8 @@
 title: "Astro Sphere"
 description: "Portfolio and blog build with astro."
 date: "Mar 18 2024"
+image: "/astro-sphere.jpg"
+tags: ["Astro", "Tailwind", "TypeScript", "SolidJS"]
 demoURL: "https://astro-sphere-demo.vercel.app"
 repoURL: "https://github.com/markhorn-dev/astro-sphere"
 ---
