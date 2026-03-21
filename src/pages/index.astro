@@ -7,42 +7,79 @@ import Link from "@components/Link.astro";
 import { SITE, HOME, SOCIALS } from "@consts";
 
 const projects = (await getCollection("projects"))
-  .filter(project => !project.data.draft)
+  .filter((project) => !project.data.draft)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
-  .slice(0,SITE.NUM_PROJECTS_ON_HOMEPAGE);
-
-
+  .slice(0, SITE.NUM_PROJECTS_ON_HOMEPAGE);
 ---
 
 <PageLayout title={HOME.TITLE} description={HOME.DESCRIPTION}>
   <Container>
-    <h4 class="animate font-semibold text-black dark:text-white">
-      Hi, I'm Nano <span class="text-xl">👋🏻</span> 
-    </h4>
     <div class="space-y-16">
       <section>
+        <div class="animate flex items-center justify-center gap-12 mb-6">
+          <!-- Profile image placeholder -->
+          <div
+            class="w-36 h-36 rounded-full bg-gray-200 dark:bg-gray-700 flex-shrink-0"
+          >
+          </div>
+          <div class="flex flex-col gap-3">
+            <h4 class="font-semibold text-black dark:text-white">
+              Hi, I'm Virginia <span class="text-xl">👋🏻</span>
+            </h4>
+            <!-- Title placeholder -->
+            <p class="text-gray-500 dark:text-gray-400">Neuroengineer</p>
+            <!-- Tags placeholder -->
+            <div class="flex flex-wrap gap-2">
+              <span
+                class="px-3 py-1 rounded-full text-sm bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
+                >motor control</span
+              >
+              <span
+                class="px-3 py-1 rounded-full text-sm bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
+                >T2</span
+              >
+              <span
+                class="px-3 py-1 rounded-full text-sm bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
+                >T3</span
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="animate space-y-6">
+        <h5 class="font-semibold text-black dark:text-white">About</h5>
         <article class="space-y-4">
           <p class="animate">
-            I am a minimal, seo friendly, accessible portfolio and blog for developers. 
-            I am an even more lightweight version of my popular theme
-            <Link href="https://github.com/markhorn-dev/astro-sphere" aria-label="Astro Sphere on Github" external>
+            I am a minimal, seo friendly, accessible portfolio and blog for
+            developers. I am an even more lightweight version of my popular
+            theme
+            <Link
+              href="https://github.com/markhorn-dev/astro-sphere"
+              aria-label="Astro Sphere on Github"
+              external
+            >
               Astro Sphere
-            </Link>.
-            I have a lighthouse scores of 100 across the board for performance, 
-            accesibility, best practices and SEO.
+            </Link>. I have a lighthouse scores of 100 across the board for
+            performance, accesibility, best practices and SEO.
           </p>
           <p class="animate">
-            I come packed with full type safety, a sitemap, an rss feed, markdown 
-            and mdx support (use components in your markdown) through astro integrations.
-            I am styled with tailwind and come preconfigured with light, dark and 
-            system/os theme preferences out of the box.
+            I come packed with full type safety, a sitemap, an rss feed,
+            markdown and mdx support (use components in your markdown) through
+            astro integrations. I am styled with tailwind and come preconfigured
+            with light, dark and system/os theme preferences out of the box.
           </p>
           <p class="animate">
             Visit
-            <Link href="https://github.com/markhorn-dev/astro-nano" aria-label="Astro Nano on Github" external>
+            <Link
+              href="https://github.com/markhorn-dev/astro-nano"
+              aria-label="Astro Nano on Github"
+              external
+            >
               Astro Nano on Github
             </Link>
-            to fork the repository, read the docs or one-click deploy on Vercel or Netlify. 
+            to fork the repository, read the docs or one-click deploy on Vercel or
+            Netlify.
           </p>
         </article>
       </section>
@@ -52,40 +89,47 @@ const projects = (await getCollection("projects"))
           <h5 class="font-semibold text-black dark:text-white">
             Recent projects
           </h5>
-          <Link href="/projects">
-            See all projects
-          </Link>
+          <Link href="/projects"> See all projects </Link>
         </div>
         <ul class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {projects.map(project => (
-            <li>
-              <ProjectCard entry={project} />
-            </li>
-          ))}
+          {
+            projects.map((project) => (
+              <li class="h-full">
+                <ProjectCard entry={project} />
+              </li>
+            ))
+          }
         </ul>
       </section>
 
       <section class="animate space-y-4">
-        <h5 class="font-semibold text-black dark:text-white">
-          Let's Connect
-        </h5>
+        <h5 class="font-semibold text-black dark:text-white">Let's Connect</h5>
         <article>
           <p>
-            If you want to get in touch with me about something or just to say hi,
-            reach out on social media or send me an email.
+            If you want to get in touch with me about something or just to say
+            hi, reach out on social media or send me an email.
           </p>
         </article>
         <ul class="flex flex-wrap gap-2">
-          {SOCIALS.map(SOCIAL => (
-            <li class="flex gap-x-2 text-nowrap">
-              <Link href={SOCIAL.HREF} external aria-label={`${SITE.NAME} on ${SOCIAL.NAME}`}>
-                {SOCIAL.NAME}
-              </Link>
-              {"/"}
-            </li>
-          ))}
+          {
+            SOCIALS.map((SOCIAL) => (
+              <li class="flex gap-x-2 text-nowrap">
+                <Link
+                  href={SOCIAL.HREF}
+                  external
+                  aria-label={`${SITE.NAME} on ${SOCIAL.NAME}`}
+                >
+                  {SOCIAL.NAME}
+                </Link>
+                {"/"}
+              </li>
+            ))
+          }
           <li class="line-clamp-1">
-            <Link href={`mailto:${SITE.EMAIL}`} aria-label={`Email ${SITE.NAME}`}>
+            <Link
+              href={`mailto:${SITE.EMAIL}`}
+              aria-label={`Email ${SITE.NAME}`}
+            >
               {SITE.EMAIL}
             </Link>
           </li>
