@@ -3,46 +3,120 @@ import { getCollection } from "astro:content";
 import PageLayout from "@layouts/PageLayout.astro";
 import Container from "@components/Container.astro";
 import { dateRange } from "@lib/utils";
-import { CV } from "@consts";
+import { CV, SITE, SOCIALS } from "@consts";
+import Link from "@components/Link.astro";
 
-const collection = (await getCollection("work"))
-  .sort((a, b) => new Date(b.data.dateStart).valueOf() - new Date(a.data.dateStart).valueOf());
+const collection = (await getCollection("work")).sort(
+  (a, b) =>
+    new Date(b.data.dateStart).valueOf() - new Date(a.data.dateStart).valueOf(),
+);
 
 const work = await Promise.all(
   collection.map(async (item) => {
     const { Content } = await item.render();
     return { ...item, Content };
-  })
+  }),
 );
 ---
 
 <PageLayout title={CV.TITLE} description={CV.DESCRIPTION}>
   <Container>
-    <div class="space-y-10">
-      <div class="animate font-semibold text-black dark:text-white">
-        CV
-      </div>
-      <section class="animate space-y-6">
-        <div class="font-semibold text-black dark:text-white">
-          Work Experience
+    <div class="animate space-y-8 font-serif [&_strong]:font-sans">
+      <section class="space-y-1">
+        <h1 class="font-sans font-semibold text-xl text-black dark:text-white">
+          {SITE.NAME}
+        </h1>
+        <div class="flex flex-wrap gap-x-4 gap-y-1">
+          {
+            SOCIALS.map((social) => (
+              <Link href={social.HREF} external aria-label={social.NAME}>
+                {social.NAME.charAt(0).toUpperCase() + social.NAME.slice(1)}
+              </Link>
+            ))
+          }
         </div>
-        <ul class="flex flex-col space-y-4">
-          {work.map(entry => (
-            <li>
-              <div class="text-sm opacity-75">
-                {dateRange(entry.data.dateStart, entry.data.dateEnd)}
-              </div>
-              <div class="font-semibold text-black dark:text-white">
-                {entry.data.company}
-              </div>
-              <div class="text-sm opacity-75">
-                {entry.data.role}
-              </div>
-              <article>
-                <entry.Content />
-              </article>
-            </li>
-          ))}
+      </section>
+
+      <section class="space-y-3">
+        <h2
+          class="font-sans font-semibold text-black dark:text-white border-b border-black dark:border-white pb-1"
+        >
+          Education
+        </h2>
+        <div class="space-y-1">
+          <p>
+            <strong>PhD in Systems Neuroscience</strong>, Georg-August
+            University of Göttingen, Germany (2024)
+          </p>
+          <p>
+            <strong>MSc in Biomedical Engineering</strong>, Delft University of
+            Technology, the Netherlands (2018)
+          </p>
+          <p>
+            <strong>BSc in Biomedical Engineering</strong>, Carlos III
+            University of Madrid, Spain (2016)
+          </p>
+        </div>
+      </section>
+
+      <section class="space-y-3">
+        <h2
+          class="font-sans font-semibold text-black dark:text-white border-b border-black dark:border-white pb-1"
+        >
+          Skills
+        </h2>
+        <div class="space-y-1">
+          <p>
+            <strong>Research expertise:</strong> Electrophysiology (multi-channel
+            neural spiking, EMG), motion-tracking (haptic manipulanda, IMUs), BCIs,
+            closed-loop data collection systems
+          </p>
+          <p>
+            <strong>Quantitative methods:</strong> Signal processing, time-series
+            analysis, feature engineering, machine learning (supervised, unsupervised),
+            model evaluation, statistical modelling and inference
+          </p>
+          <p>
+            <strong>Programming languages &amp; tools:</strong>
+            <em>Proficient</em>: Python, MATLAB, git; <em>experience</em>: C++,
+            SQL
+          </p>
+          <p>
+            <strong>Languages:</strong>
+            English (<em>proficient</em>), Spanish (<em>native</em>), German (<em
+              >intermediate</em
+            >, B1)
+          </p>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2
+          class="font-sans font-semibold text-black dark:text-white border-b border-black dark:border-white pb-1"
+        >
+          Experience
+        </h2>
+        <ul class="space-y-6">
+          {
+            work.map((entry) => (
+              <li>
+                <div class="flex justify-between gap-4">
+                  <span class="font-sans font-bold text-black dark:text-white">
+                    {entry.data.role}
+                  </span>
+                  <span class="font-sans font-bold text-black dark:text-white shrink-0">
+                    {dateRange(entry.data.dateStart, entry.data.dateEnd)}
+                  </span>
+                </div>
+                <div class="font-sans font-bold text-black dark:text-white">
+                  {entry.data.company}{entry.data.location ? `, ${entry.data.location}` : ""}
+                </div>
+                <article class="[&>ul]:mt-1 [&>ul]:space-y-1 [&>p:first-child]:mt-1">
+                  <entry.Content />
+                </article>
+              </li>
+            ))
+          }
         </ul>
       </section>
     </div>
