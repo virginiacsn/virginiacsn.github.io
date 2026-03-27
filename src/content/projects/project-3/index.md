@@ -1,8 +1,18 @@
 ---
-title: "Project Three"
-description: "A placeholder for an upcoming project."
-date: "Mar 20 2026"
-tags: ["Placeholder"]
+title: "Neural dynamics"
+description: "Neural activity during reaching under sensory uncertainty."
+date: "2025"
+image: "/project-3.png"
+tags: ["electrophysiology", "BCI", "ML", "Python"]
+repoURL: "https://github.com/virginiacsn/bci-analysis"
+publicationURL: "https://www.nature.com/articles/s41467-025-58738-x"
+featured: true
 ---
 
-This is a placeholder for an upcoming project. Details coming soon.
+## Summary
+
+## Methods
+
+## Results
+
+## Conclusions
