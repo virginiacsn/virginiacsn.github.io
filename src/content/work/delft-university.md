@@ -1,6 +1,6 @@
 ---
 company: "Delft University of Technology"
-role: "Research Intern (Master Thesis)"
+role: "Research Intern – Muscle coordination strategies"
 dateStart: "03/01/2018"
 dateEnd: "12/01/2018"
 location: "Delft, the Netherlands"

@@ -1,6 +1,6 @@
 ---
 company: "Northwestern University"
-role: "Research Intern"
+role: "Research Intern – Neurophysiology of motor control"
 dateStart: "09/01/2017"
 dateEnd: "02/01/2018"
 location: "Chicago (IL), United States"

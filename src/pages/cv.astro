@@ -53,8 +53,8 @@ const work = await Promise.all(
             Technology, the Netherlands (2018)
           </p>
           <p>
-            <strong>BSc in Biomedical Engineering</strong>, Carlos III
-            University of Madrid, Spain (2016)
+            <strong>BSc in Biomedical Engineering</strong>, Universidad Carlos
+            III de Madrid, Spain (2016)
           </p>
         </div>
       </section>
@@ -68,8 +68,8 @@ const work = await Promise.all(
         <div class="space-y-1">
           <p>
             <strong>Research expertise:</strong> Electrophysiology (multi-channel
-            neural spiking, EMG), motion-tracking (haptic manipulanda, IMUs), BCIs,
-            closed-loop data collection systems
+            neural spiking, EMG), motion-tracking (kinematics, kinetics), BCIs, closed-loop
+            data collection systems
           </p>
           <p>
             <strong>Quantitative methods:</strong> Signal processing, time-series
@@ -104,12 +104,12 @@ const work = await Promise.all(
                   <span class="font-sans font-bold text-black dark:text-white">
                     {entry.data.role}
                   </span>
-                  <span class="font-sans font-bold text-black dark:text-white shrink-0">
+                  <span class="font-sans text-black dark:text-white shrink-0">
                     {dateRange(entry.data.dateStart, entry.data.dateEnd)}
                   </span>
                 </div>
-                <div class="font-sans font-bold text-black dark:text-white">
-                  {entry.data.company}{entry.data.location ? `, ${entry.data.location}` : ""}
+                <div class="font-sans text-black dark:text-white">
+                  <span class="font-bold">{entry.data.company}</span>{entry.data.location ? `, ${entry.data.location}` : ""}
                 </div>
                 <article class="[&>ul]:mt-1 [&>ul]:space-y-1 [&>p:first-child]:mt-1">
                   <entry.Content />

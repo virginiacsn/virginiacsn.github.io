@@ -1,6 +1,6 @@
 ---
 company: "Champalimaud Foundation"
-role: "Research Assistant"
+role: "Research Assistant – Cerebellar circuits and locomotion"
 dateStart: "01/01/2019"
 dateEnd: "06/01/2019"
 location: "Lisbon, Portugal"

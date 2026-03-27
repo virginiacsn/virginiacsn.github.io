@@ -1,6 +1,6 @@
 ---
 company: "German Primate Center"
-role: "PhD Researcher"
+role: "PhD Researcher – Neurophysiology of motor control and adaptation"
 dateStart: "03/01/2020"
 dateEnd: "12/01/2024"
 location: "Göttingen, Germany"
