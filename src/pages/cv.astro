@@ -65,7 +65,7 @@ const work = await Promise.all(
         >
           Skills
         </h2>
-        <div class="space-y-1">
+        <div class="space-y-3">
           <p>
             <strong>Research expertise:</strong> Electrophysiology (multi-channel
             neural spiking, EMG), motion-tracking (kinematics, kinetics), BCIs, closed-loop
@@ -78,14 +78,7 @@ const work = await Promise.all(
           </p>
           <p>
             <strong>Programming languages &amp; tools:</strong>
-            <em>Proficient</em>: Python, MATLAB, git; <em>experience</em>: C++,
-            SQL
-          </p>
-          <p>
-            <strong>Languages:</strong>
-            English (<em>proficient</em>), Spanish (<em>native</em>), German (<em
-              >intermediate</em
-            >, B1)
+            Python, MATLAB, C++, Git, SQL
           </p>
         </div>
       </section>
@@ -111,13 +104,57 @@ const work = await Promise.all(
                 <div class="font-sans text-black dark:text-white">
                   <span class="font-bold">{entry.data.company}</span>{entry.data.location ? `, ${entry.data.location}` : ""}
                 </div>
-                <article class="[&>ul]:mt-1 [&>ul]:space-y-1 [&>p:first-child]:mt-1">
+                <article class="[&>ul]:mt-1 [&>ul]:space-y-0.5 [&>ul]:list-disc [&>ul]:pl-4 [&>ul>li]:my-0 [&>p:first-child]:mt-1">
                   <entry.Content />
                 </article>
               </li>
             ))
           }
         </ul>
+      </section>
+
+      <section class="space-y-3">
+        <h2
+          class="font-sans font-semibold text-black dark:text-white border-b border-black dark:border-white pb-1"
+        >
+          Publications
+        </h2>
+        <ul class="space-y-4">
+          <li>
+            LK Amann*, <strong>V Casasnovas</strong>*, A Gail. Visual target and
+            task-critical feedback uncertainty impair different stages of reach
+            planning in motor cortex. <em>Nature Communications</em> 16(1), 3372 (2025)
+            [<a
+              class="font-sans underline underline-offset-2 decoration-black/15 dark:decoration-white/30 hover:decoration-black/25 hover:dark:decoration-white/50 transition-colors duration-300 ease-in-out"
+              href="https://www.nature.com/articles/s41467-025-58738-x"
+              target="_blank">Link</a
+            >]
+          </li>
+          <li>
+            LK Amann, <strong>V Casasnovas</strong>, J Hainke, A Gail.
+            Optimality of multisensory integration while compensating for
+            uncertain visual target information with artificial vibrotactile
+            cues during reach planning. <em
+              >Journal of NeuroEngineering and Rehabilitation</em
+            >
+            21(1), 155 (2024) [<a
+              class="font-sans underline underline-offset-2 decoration-black/15 dark:decoration-white/30 hover:decoration-black/25 hover:dark:decoration-white/50 transition-colors duration-300 ease-in-out"
+              href="https://link.springer.com/article/10.1186/s12984-024-01448-0"
+              target="_blank">Link</a
+            >]
+          </li>
+          <li>
+            <strong>V Casasnovas</strong>, LK Amann, GL Haas, A Gail.
+            Task-relevant visual feedback uncertainty attenuates visuomotor
+            adaptation. <em>Journal of Neurophysiology</em> 132(3), 879–889 (2024)
+            [<a
+              class="font-sans underline underline-offset-2 decoration-black/15 dark:decoration-white/30 hover:decoration-black/25 hover:dark:decoration-white/50 transition-colors duration-300 ease-in-out"
+              href="https://journals.physiology.org/doi/full/10.1152/jn.00180.2024"
+              target="_blank">Link</a
+            >]
+          </li>
+        </ul>
+        <p class="text-sm">* Equal contribution</p>
       </section>
     </div>
   </Container>
