@@ -16,7 +16,7 @@ const projects = (await getCollection("projects"))
       <div class="animate font-semibold text-black dark:text-white">
         Projects
       </div>
-      <ul class="animate grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <ul class="animate grid grid-cols-1 sm:grid-cols-3 gap-4" style="grid-auto-rows: 1fr;">
         {
           projects.map((project) => (
             <li class="h-full">
