@@ -8,11 +8,3 @@ publicationURL: "https://repository.tudelft.nl/record/uuid:f614c737-56e7-48e1-9a
 repoURL: "https://github.com/virginiacsn/force-emg-task"
 featured: true
 ---
-
-## Summary
-
-## Methods
-
-## Results
-
-## Conclusions

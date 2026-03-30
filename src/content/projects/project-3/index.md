@@ -8,11 +8,3 @@ repoURL: "https://github.com/virginiacsn/bci-analysis"
 publicationURL: "https://www.nature.com/articles/s41467-025-58738-x"
 featured: true
 ---
-
-## Summary
-
-## Methods
-
-## Results
-
-## Conclusions

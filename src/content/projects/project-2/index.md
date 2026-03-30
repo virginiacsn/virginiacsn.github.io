@@ -7,11 +7,3 @@ tags: ["motion-tracking", "GLMM", "MATLAB"]
 publicationURL: "https://journals.physiology.org/doi/full/10.1152/jn.00180.2024"
 featured: true
 ---
-
-## Summary
-
-## Methods
-
-## Results
-
-## Conclusions
