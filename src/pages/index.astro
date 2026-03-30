@@ -9,12 +9,92 @@ import { SITE, HOME, SOCIALS } from "@consts";
 const emailEncoded = Buffer.from(SITE.EMAIL).toString("base64");
 
 const projects = (await getCollection("projects"))
-  .filter((project) => !project.data.draft)
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
-  .slice(0, SITE.NUM_PROJECTS_ON_HOMEPAGE);
+  .filter((project) => !project.data.draft && project.data.featured)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 ---
 
 <PageLayout title={HOME.TITLE} description={HOME.DESCRIPTION}>
+  <div class="star-field" aria-hidden="true">
+    <span
+      class="star"
+      style="top: 8%; left: 3%; font-size: 1.2rem; animation-delay: 0s;">✦</span
+    >
+    <span
+      class="star"
+      style="top: 20%; left: 8%; font-size: 0.9rem; animation-delay: 1.2s;"
+      >✶</span
+    >
+    <span
+      class="star"
+      style="top: 5%; left: 18%; font-size: 1rem; animation-delay: 2.4s;"
+      >✦</span
+    >
+    <span
+      class="star"
+      style="top: 65%; left: 1%; font-size: 0.8rem; animation-delay: 0.8s;"
+      >✶</span
+    >
+    <span
+      class="star"
+      style="top: 85%; left: 12%; font-size: 1.1rem; animation-delay: 3.1s;"
+      >✦</span
+    >
+    <span
+      class="star"
+      style="top: 45%; left: 4%; font-size: 0.75rem; animation-delay: 3.5s;"
+      >✶</span
+    >
+    <span
+      class="star"
+      style="top: 12%; right: 3%; font-size: 1rem; animation-delay: 1.7s;"
+      >✦</span
+    >
+    <span
+      class="star"
+      style="top: 30%; right: 8%; font-size: 0.8rem; animation-delay: 0.4s;"
+      >✶</span
+    >
+    <span
+      class="star"
+      style="top: 60%; right: 2%; font-size: 1.2rem; animation-delay: 2.8s;"
+      >✦</span
+    >
+    <span
+      class="star"
+      style="top: 78%; right: 14%; font-size: 0.9rem; animation-delay: 1.5s;"
+      >✶</span
+    >
+    <span
+      class="star"
+      style="top: 10%; left: 36%; font-size: 0.85rem; animation-delay: 2.1s;"
+      >✦</span
+    >
+    <span
+      class="star"
+      style="top: 80%; left: 43%; font-size: 1rem; animation-delay: 0.6s;"
+      >✶</span
+    >
+    <span
+      class="star"
+      style="top: 35%; left: 58%; font-size: 0.8rem; animation-delay: 3.8s;"
+      >✦</span
+    >
+    <span
+      class="star"
+      style="top: 90%; left: 65%; font-size: 0.9rem; animation-delay: 1.9s;"
+      >✶</span
+    >
+    <span
+      class="star"
+      style="top: 18%; left: 78%; font-size: 1.1rem; animation-delay: 4.2s;"
+      >✦</span
+    >
+    <span
+      class="star"
+      style="top: 55%; left: 28%; font-size: 0.75rem; animation-delay: 2.7s;"
+      >✶</span
+    >
+  </div>
   <Container>
     <div class="space-y-16">
       <section>
@@ -36,7 +116,7 @@ const projects = (await getCollection("projects"))
             <div class="flex flex-wrap gap-2">
               <span
                 class="px-3 py-1 rounded-full text-sm bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
-                >motor control</span
+                >movement control</span
               >
               <span
                 class="px-3 py-1 rounded-full text-sm bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
@@ -54,60 +134,141 @@ const projects = (await getCollection("projects"))
       <section class="animate space-y-6">
         <h5 class="font-semibold text-lg text-black dark:text-white">About</h5>
         <article class="space-y-4">
+          <p class="animate">
+            I'm a neuroscience researcher, biomedical engineer, and data
+            scientist. My research has focused on understanding how the brain
+            controls movement, aiming to drive the development of better
+            solutions for patients with motor disabilities. After living in
+            different countries across Europe, and the US, I'm now based in
+            Toronto, Canada.
+          </p>
+          <p class="animate">
+            I completed my
+            <Link
+              href="https://ediss.uni-goettingen.de/handle/11858/15872?locale-attribute=en"
+              aria-label="Astro Nano on Github"
+              external>PhD</Link
+            >
+            in Systems Neuroscience at the
+            <Link
+              href="https://www.dpz.eu/en/cognitive-neuroscience-unit"
+              aria-label="Astro Nano on Github"
+              external>German Primate Center</Link
+            >, where I studied the effect of arm sensory uncertainty on how we
+            control our movements and learn new ones. Before that, I worked as a
+            research assistant at the
+            <Link
+              href="https://www.fchampalimaud.org/research/groups/carey"
+              aria-label="Astro Nano on Github"
+              external>Champalimaud Foundation</Link
+            >, where I explored molecular neuromodulation techniques and the
+            cerebellum's role in locomotion. Even longer ago, I trained as a
+            biomedical engineer at <Link
+              href="https://www.uc3m.es/bachelor-degree/biomedical"
+              aria-label="Astro Nano on Github"
+              external>Universidad Carlos III de Madrid</Link
+            > and
+            <Link
+              href="https://www.tudelft.nl/en/me/about/departments/biomechanical-engineering"
+              aria-label="Astro Nano on Github"
+              external>Delft University of Technology</Link
+            >, including an internship at <Link
+              href="https://miller-limblab.squarespace.com/"
+              aria-label="Astro Nano on Github"
+              external>Northwestern University</Link
+            >.
+          </p>
+          <p class="animate">
+            <span class="font-sans italic">What's next?</span> I'm interested in getting
+            closer to translatonal approaches within neurotechnology, wearables, and
+            digital health. I'm driven by having a positive impact on people's health
+            and contributing to the technology that makes that possible.
+          </p>
           <p class="animate"></p>
         </article>
-      </section>
 
-      <section class="animate space-y-6">
-        <div class="flex flex-wrap gap-y-2 items-center justify-between">
+        <section class="animate space-y-6">
+          <div class="flex flex-wrap gap-y-2 items-center justify-between">
+            <h5 class="font-semibold text-lg text-black dark:text-white">
+              Featured projects
+            </h5>
+            <Link href="/projects"> See all projects </Link>
+          </div>
+          <ul class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {
+              projects.map((project) => (
+                <li class="h-full">
+                  <ProjectCard entry={project} />
+                </li>
+              ))
+            }
+          </ul>
+        </section>
+
+        <section class="animate space-y-4">
           <h5 class="font-semibold text-lg text-black dark:text-white">
-            Recent projects
+            Let's Connect
           </h5>
-          <Link href="/projects"> See all projects </Link>
-        </div>
-        <ul class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {
-            projects.map((project) => (
-              <li class="h-full">
-                <ProjectCard entry={project} />
-              </li>
-            ))
-          }
-        </ul>
-      </section>
-
-      <section class="animate space-y-4">
-        <h5 class="font-semibold text-lg text-black dark:text-white">
-          Let's Connect
-        </h5>
-        <article>
-          <p>
-            If you'd like to get in touch, feel free to reach out on{" "}
-            <Link
-              href={SOCIALS.find((s) => s.NAME === "linkedin")!.HREF}
-              external
-              aria-label={`${SITE.NAME} on LinkedIn`}
-            >
-              LinkedIn
-            </Link>{" "}
-            or send me an <span class="js-email-link"></span>. I'm happy to
-            chat!
-          </p>
-        </article>
+          <article>
+            <p>
+              If you'd like to get in touch, feel free to reach out on{" "}
+              <Link
+                href={SOCIALS.find((s) => s.NAME === "linkedin")!.HREF}
+                external
+                aria-label={`${SITE.NAME} on LinkedIn`}
+              >
+                LinkedIn</Link
+              > or send me an <span class="js-email-link"></span>. I'm happy to
+              chat!
+            </p>
+          </article>
+        </section>
       </section>
     </div>
-  </Container>
-  <script is:inline define:vars={{ emailEncoded }}>
-    document.addEventListener("DOMContentLoaded", function () {
-      const email = atob(emailEncoded);
-      document.querySelectorAll(".js-email-link").forEach(function (el) {
-        const a = document.createElement("a");
-        a.href = "mailto:" + email;
-        a.textContent = "email";
-        a.className =
-          "inline-block underline underline-offset-2 decoration-black/15 dark:decoration-white/30 hover:decoration-black/25 hover:dark:decoration-white/50 text-current hover:text-black hover:dark:text-white transition-colors duration-300 ease-in-out";
-        el.replaceWith(a);
+    <script is:inline define:vars={{ emailEncoded }}>
+      document.addEventListener("DOMContentLoaded", function () {
+        const email = atob(emailEncoded);
+        document.querySelectorAll(".js-email-link").forEach(function (el) {
+          const a = document.createElement("a");
+          a.href = "mailto:" + email;
+          a.textContent = "email";
+          a.className =
+            "inline-block underline underline-offset-2 decoration-black/15 dark:decoration-white/30 hover:decoration-black/25 hover:dark:decoration-white/50 text-current hover:text-black hover:dark:text-white transition-colors duration-300 ease-in-out";
+          el.replaceWith(a);
+        });
       });
-    });
-  </script>
+    </script>
+    <style>
+      .star-field {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        width: min(100vw, 56rem);
+        top: 0;
+        height: 20rem;
+        pointer-events: none;
+        overflow: hidden;
+      }
+      .star {
+        position: absolute;
+        pointer-events: none;
+        color: rgba(0, 0, 0, 0.25);
+        animation: twinkle 4s ease-in-out infinite;
+      }
+      :global(.dark) .star {
+        color: rgba(255, 255, 255, 0.25);
+      }
+      @keyframes twinkle {
+        0%,
+        100% {
+          opacity: 0.15;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.7;
+          transform: scale(1.2);
+        }
+      }
+    </style>
+  </Container>
 </PageLayout>

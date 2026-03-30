@@ -34,12 +34,16 @@ export const CV: Metadata = {
 };
 
 export const SOCIALS: Socials = [
-  { 
+  {
+    NAME: "linkedin",
+    HREF: "https://www.linkedin.com/in/virginia-casasnovas",
+  },
+  {
     NAME: "github",
     HREF: "https://github.com/virginiacsn"
   },
-  { 
-    NAME: "linkedin",
-    HREF: "https://www.linkedin.com/in/virginia-casasnovas",
+  {
+    NAME: "google scholar",
+    HREF: "https://scholar.google.com/citations?user=YOUR_ID",
   }
 ];
