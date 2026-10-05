@@ -67,15 +67,15 @@ const work = await Promise.all(
         </h2>
         <div class="space-y-3">
           <p>
-            <strong>Research expertise:</strong> Electrophysiology (multi-channel
+            <strong>Neuroscience methods:</strong> Electrophysiology (multi-channel
             neural spiking, EMG), motion-tracking (kinematics, kinetics), BCIs, closed-loop
             data collection systems
           </p>
-          <p>
+          <!-- <p>
             <strong>Quantitative methods:</strong> Signal processing, time-series
             analysis, feature engineering, machine learning (supervised, unsupervised),
             model evaluation, statistical modelling and inference
-          </p>
+          </p> -->
           <p>
             <strong>Programming languages &amp; tools:</strong>
             Python, MATLAB, C++, Git, SQL
@@ -102,7 +102,8 @@ const work = await Promise.all(
                   </span>
                 </div>
                 <div class="font-sans text-black dark:text-white">
-                  <span class="font-bold">{entry.data.company}</span>{entry.data.location ? `, ${entry.data.location}` : ""}
+                  <span class="font-bold">{entry.data.company}</span>
+                  {entry.data.location ? `, ${entry.data.location}` : ""}
                 </div>
                 <article class="[&>ul]:mt-1 [&>ul]:space-y-0.5 [&>ul]:list-disc [&>ul]:pl-4 [&>ul>li]:my-0 [&>p:first-child]:mt-1">
                   <entry.Content />

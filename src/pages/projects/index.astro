@@ -6,7 +6,7 @@ import ProjectCard from "@components/ProjectCard.astro";
 import { PROJECTS } from "@consts";
 
 const projects = (await getCollection("projects"))
-  .filter(project => !project.data.draft)
+  .filter(project => !project.data.draft && !project.data.hidden)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 ---
 
