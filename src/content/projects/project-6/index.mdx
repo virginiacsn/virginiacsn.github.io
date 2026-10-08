@@ -1,0 +1,380 @@
+---
+title: "Women's cycle tracking"
+description: "Classifying cycle phase from wearable, hormonal, and self-report data."
+date: "2026"
+image: "/figures/project-6/eval_test.png"
+tags: ["wearables", "ML", "Python"]
+# publicationURL: ""
+repoURL: "https://github.com/virginiacsn/cycle-tracking"
+draft: false
+toc: true
+featured: true
+---
+
+import Stack from "@components/Stack.astro";
+
+**Predicting women's cycle phase from multimodal data**
+
+<Stack
+  items={["Python", "pandas", "scikit-learn", "XGBoost", "Optuna", "SHAP"]}
+/>
+
+---
+
+## TL;DR
+
+- **Question:** wearables collect physiological data passively, but can they identify
+  menstrual cycle phase, and how do they compare with hormone assays and daily symptom
+  diaries, which cost more to collect?
+- **Approach:** seven combinations of Fitbit wearable data, hormone
+  measurements, and daily self-reports for classifying cycle phase (Menstrual,
+  Follicular, Fertility, Luteal), using 42 participants (3,694 participant-days) from a
+  public PhysioNet dataset.
+- **Wearables alone carry limited information about phase:** macro-F1 of 0.46
+  against a chance level of 0.25.
+- **Self-reports add about twice as much as hormones when combined with wearables**
+  (ΔF1 = +0.11 vs. +0.06), and are cheaper to collect.
+- **The best model used hormones and self-reports without wearables** (XGBoost,
+  macro-F1 = 0.63, AUROC = 0.86).
+- **Performance is limited mainly by the number of participants.** Validation
+  performance was still increasing at the largest training cohort tested, and the
+  wearables-only models overfit to individual participants.
+
+---
+
+## Background
+
+### Why cycle phase matters
+
+The menstrual cycle is commonly divided into four phases. Each is defined by a
+characteristic pattern of estradiol, progesterone, and luteinizing hormone (LH):
+
+- **Menstrual:** bleeding, with low hormone levels.
+- **Follicular:** estradiol rises as a follicle matures.
+- **Fertility:** the window around ovulation, which an LH surge triggers.
+- **Luteal:** progesterone dominates after ovulation.
+
+Phase affects sleep, thermoregulation, cardiovascular function, mood, and symptom
+burden. As a result, it is relevant to fertility planning and personal health
+monitoring. It is also a confounder in clinical and physiological research, where it
+often goes unmeasured.
+
+The reference methods for determining phase are serial hormone measurement and
+ultrasound. Both are accurate, but neither is practical for continuous use outside a
+study. Most consumer apps instead estimate phase by counting days since the last
+period and assuming a fixed cycle template. Cycle length and phase durations vary both
+between people and from one cycle to the next within the same person, so these
+calendar estimates become less reliable the further they are from the last period.
+
+### What wearables could offer
+
+Many of the physiological changes across the cycle are measured continuously by
+consumer wearables:
+
+- **Temperature:** basal body temperature rises after ovulation.
+- **Heart rate:** resting heart rate tends to be higher in the luteal phase.
+- **Heart rate variability (HRV):** HRV and sleep architecture change across phases.
+
+If these signals were enough to identify phase, monitoring could be continuous and
+almost cost-free. In practice, consumer data are noisy: wear time is inconsistent,
+nights are missing, devices differ, and baselines vary widely between individuals. The
+cycle-related changes are also small relative to those other sources of variation.
+
+### Research question
+
+> **How much does classification of cycle phase improve when hormonal and/or self-reported
+> measures are added to wearable data, and how does each gain compare with the cost of
+> collecting that data?**
+
+Framed this way, the question is about decisions rather than only about accuracy. Each
+data source has a different cost to collect, and the useful result is the marginal
+value of each source, not the model with the highest score.
+
+### Dataset
+
+[mcPHASES](https://doi.org/10.13026/zx6a-2c81)<sup><a href="#ref-1">1</a></sup> provides
+data collected simultaneously from three sources in the same participants. The daily
+variables selected from each source were:
+
+| Source           | Variables                                                                                                                                                                                                                                                                                                                                                                          | Burden of collection           |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
+| **Wearables**    | **Heart:** heart rate, resting heart rate, HRV (RMSSD, high-frequency power, low-frequency power)<br />**Sleep:** total sleep time, minutes of deep, light, and REM sleep, sleep efficiency<br />**Activity:** minutes of light, moderate, and high activity, step count<br />**Body:** skin temperature, temperature deviation from baseline, respiratory rate, estimated VO₂ max | Passive (Fitbit)               |
+| **Hormones**     | estrogen<br />luteinizing hormone (LH)                                                                                                                                                                                                                                                                                                                                             | Requires daily assays          |
+| **Self-reports** | **Menstrual:** flow volume (8-point scale), cramps, sore breasts<br />**Digestive:** appetite, food cravings, indigestion, bloating<br />**General:** headaches, fatigue, sleep issues, mood swings, stress, exercise level                                                                                                                                                        | Daily entry by the participant |
+
+Each symptom was rated on a 6-point scale from "Not at all" to "Very High".
+
+The dataset provides a phase label for each day, which served as the ground truth for
+classification.
+
+---
+
+## Methods
+
+### Preprocessing
+
+The wearable data comes as about ten separate exports, each recorded at a different
+resolution: minute-level heart rate, sleep sessions, and step counts per interval.
+`src/dataset.py` harmonizes them into one row per participant-day and merges them with
+the hormone and self-report tables.
+
+- **Duplicate records:** where a participant had duplicate records for the same day,
+  the pipeline kept the better-sampled one. For example, it chose the temperature
+  record with the most samples and the longest main sleep session, rather than an
+  arbitrary record.
+- **Non-physiological values:** readings such as zero hormone concentrations or
+  negative HRV were set to missing instead of removing the whole day. This keeps the
+  day's other valid measureme3nts.
+- **Computed variables:**
+  - **Wear time:** minutes per day that the device was worn, used later as a QC
+    criterion. Heart rate was resampled into 5-minute bins, and wear time was estimated
+    as the number of bins containing a heart-rate reading, multiplied by 5.
+  - **Cycle boundaries:** defined as each return to the Menstrual phase. This gives
+    every day a cycle index and a flag for whether its cycle is complete.
+
+### Quality control
+
+`src/qc.py` runs as a separate stage of the pipeline, in two parts:
+
+- **Exclusion criteria:**
+  - days with less than 10 hours of wear
+  - participants with fewer than 30 valid days
+- **Diagnostic checks, logged for review rather than applied automatically:**
+  - columns with more than 75% missing values
+  - medians outside physiological reference ranges
+  - pairs of features with |r| ≥ 0.9
+
+QC excluded only 4 of 3,698 participant-days
+and no participants, leaving **42 participants and 3,694 participant-days**.
+
+### Feature engineering
+
+- **Within-participant normalization.** Wearable and hormone features were z-scored
+  separately for each participant. As a result, the model sees deviations from each
+  person's own baseline rather than differences between people. This matters because
+  differences between people in, for example, resting heart rate are typically larger
+  than the changes across a single cycle.
+- **Temporal context.** Rolling means and standard deviations over 7 and 14 days were
+  computed for every source. Phase changes slowly, while single-day measurements are
+  noisy.
+- **Derived physiological ratios:** the HRV low-frequency/high-frequency ratio and the
+  estrogen/LH ratio.
+- **Encoding of symptoms:** each symptom scale was converted to an ordinal number.
+- **Cyclical position.** Period onset was identified from self-reported flow, defined
+  as consecutive days of moderate or heavier flow. The number of days since onset was
+  then encoded as sine and cosine terms, so that the end of one cycle sits next to the
+  start of the next. These features use only information a user would record
+  themselves. Because they are closely related to how the phase labels are defined,
+  they are discussed again under [Limitations](#limitations).
+
+Training combined the per-source feature tables into all **seven subsets of sources**.
+Comparing these subsets gives the marginal contribution of each source.
+
+### Modeling and evaluation
+
+- **Generalization to new individuals.** Participants were split 30 / 6 / 6 into
+  training, validation, and test sets. No participant contributed days to more than
+  one set. Days from the same person are strongly correlated, so a random split by day
+  would let a model score well by recognizing individuals rather than phase, and would
+  overestimate performance. A split by participant tests the scenario that matters in
+  practice: a new user.
+- **Models:**
+  - multinomial logistic regression, a linear, interpretable baseline
+  - gradient-boosted trees (XGBoost), which can model non-linear relationships and
+    interactions
+- **Tuning:** hyperparameters were tuned with Optuna (50 trials for each combination
+  of model and source subset) to maximize macro-F1 on the validation set. The test set
+  was evaluated once.
+- **Metrics:** accuracy, macro-F1, macro-recall, and one-vs-rest AUROC. Macro-F1 is the
+  primary metric because it weights the four phases equally regardless of how often
+  each occurs.
+
+### Interpretability
+
+Feature attributions use SHAP values, which split each prediction into the
+contribution of each feature. The `shap` library's dependency on `numba` does not
+support this project's Python version, so I implemented exact attributions directly:
+
+- **XGBoost:** Tree SHAP, through the model's native `pred_contribs` output.
+- **Logistic regression:** the closed-form linear SHAP solution,
+  φᵢ = βᵢ · (xᵢ − E[xᵢ]).
+
+---
+
+## Results
+
+### Contribution of each data source
+
+<img
+  src="/figures/project-6/eval_test.png"
+  alt="Macro-F1 across all seven source combinations"
+  class="mx-auto w-full max-w-sm"
+/>
+
+The best model for each source subset, on held-out participants:
+
+| Sources                             | Best model | Macro-F1  | ΔF1 vs. wearables | AUROC |
+| ----------------------------------- | ---------- | --------- | ----------------- | ----- |
+| Wearables _(reference)_             | LR         | 0.463     | —                 | 0.738 |
+| Wearables + hormones                | XGB        | 0.519     | +0.056            | 0.782 |
+| Wearables + self-reports            | XGB        | 0.574     | +0.111            | 0.839 |
+| Wearables + hormones + self-reports | XGB        | 0.621     | +0.158            | 0.871 |
+| **Hormones + self-reports**         | **XGB**    | **0.630** | **+0.167**        | 0.863 |
+
+1. **Wearables carry information about phase, but not enough to use on their own.**
+   Wearable-only models perform clearly above chance, but they misclassify about half
+   of all days.
+2. **Self-reports are the most valuable source to add to wearables.** Their gain is
+   about twice that of hormones, and they require no laboratory assays.
+3. **Once hormones and self-reports are included, wearables add nothing detectable.**
+   The model without wearables (0.630) and the model with all three sources (0.621)
+   differ by less than can be resolved with a test set of 6 participants. The
+   three-source model has a marginally higher AUROC (0.871 vs. 0.863), so wearables may
+   slightly improve how confidently the model ranks phases.
+
+### Pattern of errors
+
+<img
+  src="/figures/project-6/fitbit_hormones_selfreports_confusion.png"
+  alt="Confusion matrix, all three sources"
+  class="mx-auto w-full max-w-lg"
+/>
+
+Errors are concentrated between phases that are adjacent in time:
+
+- **Menstrual and Luteal**, which meet where one cycle ends and the next begins.
+- **Follicular and Fertility.**
+
+Phases on opposite sides of the cycle, such as Menstrual and Fertility, are rarely
+confused. This error structure is what one would expect if the model has learned the
+cycle's temporal organization. Most of the remaining error comes from imprecise phase
+boundaries rather than from wrong predictions about where in the cycle a day falls.
+
+### Feature attributions
+
+<img
+  src="/figures/project-6/shap_summary_by_class.png"
+  alt="SHAP values by class"
+  class="mx-auto w-full max-w-full"
+/>
+
+- **Hormonal features** (LH, estrogen, and their rolling means) contribute most to the
+  Follicular, Fertility, and Luteal predictions. This agrees with the known
+  physiology: the rise in estradiol before ovulation and the LH surge that marks the
+  fertile window.
+- **Wearable features** (resting heart rate, sleep composition, temperature) contribute
+  mainly to the Menstrual prediction, and their attributions are smaller.
+- **Cycle position and flow volume have the largest attributions overall.** This is
+  expected, but it limits how far the self-report results can be interpreted (see
+  [Limitations](#limitations)).
+
+### Generalization diagnostics
+
+<img
+  src="/figures/project-6/eval_gap.png"
+  alt="Train–test F1 gap by source subset and model"
+  class="mx-auto w-full max-w-sm"
+/>
+
+- **The wearable-only XGBoost model has the largest gap between training and test
+  performance** (ΔF1 ≈ 0.47), meaning it overfits to the training participants. This
+  is the only source subset where logistic regression outperforms XGBoost. That
+  pattern is consistent with a weak signal relative to the noise, where a more flexible
+  model fits participant-specific noise.
+- **Models that include hormones and self-reports generalize best**, with gaps of about
+  0.15 to 0.20.
+
+<img
+  src="/figures/project-6/learning_curve_fitbit_hormones_selfreports_xgboost.png"
+  alt="Learning curve, all three sources, XGBoost"
+  class="mx-auto w-full max-w-lg"
+/>
+
+Validation macro-F1 rises from 0.51 with 5 training participants to 0.63 with 30, and
+the curve has not leveled off. **Performance is currently limited by the number of
+participants rather than by model capacity.** Recruiting more participants is likely to
+improve results more than further model tuning would, which is directly relevant to
+planning future data collection.
+
+---
+
+## Limitations
+
+- **Statistical power.** The test set contains 6 participants. The ranking of source
+  subsets is broadly consistent across both model families, but the individual metric values
+  have wide confidence intervals, which have not yet been estimated.
+- **Features closely related to the label definition.** Flow volume is close to the
+  definition of the Menstrual phase, and the cycle-position features are counted from
+  flow-based period onset. Both are realistically available in a tracking app. Even
+  so, part of the self-report advantage probably reflects tracking the time since the
+  last period rather than information from symptoms. The wearable-only and
+  hormone-only results do not include these features and are not affected.
+- **Normalization uses information from later days.** Each participant's z-score
+  parameters are computed from their entire recording, including days after the one
+  being classified. A deployed system would need a baseline that only uses past data,
+  which would probably reduce performance somewhat.
+- **Reproducibility.** The Optuna sampler is not seeded, so metrics vary slightly
+  between runs. The participant split is fixed.
+- **Compliance outside a study.** Hormone assays and symptom diaries depend on
+  participants testing and logging every day. In the study that collected this
+  dataset<sup><a href="#ref-2">2</a></sup>, participants were paid for each day of complete data collection. Some participants said they would only use the hormone
+  test again if trying to conceive, and several said that before the study they had
+  only logged their period dates, not symptoms. Everyday users without these
+  incentives are likely to test and log less consistently. Wearables collect data
+  passively and only need to be worn and charged, so they are much less affected. The
+  gains from hormones and self-reports may therefore be smaller in real-world use than
+  they are here.
+
+## Future work
+
+1. **Ablation of flow and cycle-position features.** This would measure how much
+   information the symptom ratings carry on their own.
+2. **Expanding-window normalization.** Each day would be normalized using only data
+   available up to that day, as in deployment.
+3. **Cross-validation that holds out whole participants**, in place of a single split.
+   This would provide confidence intervals and allow formal comparison between models.
+4. **Temporal models.** Phases occur in a fixed order, so a hidden Markov model or a
+   sequence model could enforce valid transitions. This would directly address the
+   errors between adjacent phases.
+
+---
+
+## Implementation
+
+```
+src/
+├── dataset.py        raw exports → participant-day table
+├── qc.py             exclusion criteria and diagnostic checks
+├── features.py       normalization, rolling statistics, encodings
+├── plots.py          result figures
+└── modeling/
+    ├── train.py        participant-level split, metrics, exact SHAP
+    ├── classifiers.py  model pipelines and Optuna search
+    ├── diagnostics.py  generalization gap, learning and validation curves
+    └── predict.py      inference
+```
+
+- **Stages:** each stage is a command-line step that reads from one data directory and
+  writes to the next (`raw/` → `interim/` → `processed/`). Any stage can be re-run on
+  its own.
+- **Run log:** every training run is appended to `models/results/runs.jsonl` with its
+  parameters and metrics, so each experiment can be traced back to its configuration.
+- **Diagnostics:** the generalization diagnostics reuse the tuned hyperparameters and
+  do not repeat the search.
+- **Tooling:** `loguru` for logging, `ruff` for linting and formatting, and `pipenv`
+  for managing the environment.
+
+---
+
+## References
+
+1. <a id="ref-1"></a>Lin, B., Li, J. Y., Kalani, K., Truong, K., & Mariakakis,
+   A. (2025). _mcPHASES: A Dataset of Physiological, Hormonal, and Self-reported
+   Events and Symptoms for Menstrual Health Tracking with Wearables_ (version
+   1.0.0). PhysioNet. https://doi.org/10.13026/zx6a-2c81
+
+2. <a id="ref-2"></a>Lin, G., Li, B., Li, H., Zhao, C., Truong, K. N., &
+   Mariakakis, A. (2024). _Users' Perspectives on Multimodal Menstrual Tracking
+   Using Consumer Health Devices_. Proceedings of the ACM on Interactive,
+   Mobile, Wearable and Ubiquitous Technologies (IMWUT).
+   https://arxiv.org/abs/2409.03853

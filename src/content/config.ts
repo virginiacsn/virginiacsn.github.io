@@ -30,6 +30,7 @@ const projects = defineCollection({
     draft: z.boolean().optional(),
     featured: z.boolean().optional(),
     hidden: z.boolean().optional(),
+    toc: z.boolean().optional(),
     image: z.string().optional(),
     tags: z.array(z.string()).optional(),
     publicationURL: z.string().optional(),

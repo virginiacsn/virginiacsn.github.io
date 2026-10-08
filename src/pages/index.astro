@@ -24,12 +24,14 @@ const projects = (await getCollection("projects"))
             class="w-40 h-40 rounded-full object-cover flex-shrink-0 ring-1 ring-offset-4 ring-offset-white dark:ring-offset-gray-800 ring-gray-500 dark:ring-white"
           />
           <div class="flex flex-col gap-3">
-            <h4 class="font-semibold text-xl text-black dark:text-white leading-none">
+            <h4
+              class="font-semibold text-xl text-black dark:text-white leading-none"
+            >
               Hi, I'm Virginia!
             </h4>
             <!-- Title placeholder -->
             <p class="text-lg text-gray-500 dark:text-gray-400">
-              Neuroscience researcher
+              Neuroscience Researcher & Data Scientist
             </p>
             <!-- Tags placeholder -->
             <div class="flex flex-wrap gap-2">
@@ -39,7 +41,7 @@ const projects = (await getCollection("projects"))
               >
               <span
                 class="px-3 py-1 rounded-full text-sm bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
-                >neural dynamics</span
+                >neural electrophysiology</span
               >
               <span
                 class="px-3 py-1 rounded-full text-sm bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
@@ -54,10 +56,10 @@ const projects = (await getCollection("projects"))
         <h5 class="font-semibold text-lg text-black dark:text-white">About</h5>
         <article class="space-y-4">
           <p class="animate">
-            I'm a neuroscience researcher, biomedical engineer, and data
+            I'm a systems neuroscientist, biomedical engineer, and data
             scientist. My research has focused on understanding how the brain
-            controls movement, aiming to drive the development of better
-            solutions for patients with motor disabilities. After living in
+            controls movement, with the goal of informing the development of
+            technologies for patients with motor disabilities. After living in
             different countries across Europe, and the US, I'm now based in
             Toronto, Canada.
           </p>
@@ -113,7 +115,10 @@ const projects = (await getCollection("projects"))
             </h5>
             <Link href="/projects"> See all projects </Link>
           </div>
-          <ul class="grid grid-cols-1 sm:grid-cols-3 gap-4" style="grid-auto-rows: 1fr;">
+          <ul
+            class="grid grid-cols-1 sm:grid-cols-3 gap-4"
+            style="grid-auto-rows: 1fr;"
+          >
             {
               projects.map((project) => (
                 <li class="h-full">

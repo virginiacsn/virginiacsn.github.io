@@ -1,0 +1,34 @@
+---
+// Tech-stack pills with optional monochrome logos from src/icons/<name>.svg,
+// where <name> is the item lowercased with non-alphanumerics removed
+// (e.g. "scikit-learn" → scikitlearn.svg). Items without an icon render as text.
+type Props = { items: string[] };
+
+const { items } = Astro.props;
+
+const icons = import.meta.glob<string>("/src/icons/*.svg", {
+  query: "?raw",
+  import: "default",
+  eager: true,
+});
+
+// Logos that read small at the default size
+const large = new Set(["scikitlearn"]);
+
+function icon(name: string) {
+  const slug = name.toLowerCase().replace(/[^a-z0-9]/g, "");
+  const svg = icons[`/src/icons/${slug}.svg`];
+  if (!svg) return null;
+  const size = large.has(slug) ? "size-4" : "size-3";
+  return svg.replace("<svg ", `<svg class="${size}" aria-hidden="true" `);
+}
+---
+
+<div class="not-prose flex flex-wrap gap-1.5">
+  {items.map((item) => (
+    <span class="inline-flex items-center gap-1 font-mono text-xs px-2 py-0.5 rounded-md bg-black/5 dark:bg-white/10 border border-black/10 dark:border-white/15">
+      <Fragment set:html={icon(item)} />
+      {item}
+    </span>
+  ))}
+</div>

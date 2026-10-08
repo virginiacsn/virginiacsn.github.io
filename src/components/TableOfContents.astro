@@ -1,0 +1,93 @@
+---
+import type { MarkdownHeading } from "astro";
+
+type Props = {
+  headings: MarkdownHeading[];
+  showTitle?: boolean;
+};
+
+const { showTitle = true } = Astro.props;
+const headings = Astro.props.headings.filter((h) => h.depth >= 2 && h.depth <= 3);
+---
+
+<nav aria-label="Contents" class="toc text-sm">
+  {showTitle && <div class="mb-3 font-semibold text-black dark:text-white">Contents</div>}
+  <div class="relative">
+    <!-- Track and the moving highlight bar -->
+    <div class="absolute inset-y-0 left-0 w-px bg-black/10 dark:bg-white/15"></div>
+    <div
+      class="toc-bar absolute left-0 w-0.5 -translate-x-[0.5px] rounded-full bg-black dark:bg-white opacity-0 transition-all duration-300 ease-out"
+    ></div>
+    <ul class="space-y-0.5">
+      {
+        headings.map((heading) => (
+          <li>
+            <a
+              href={`#${heading.slug}`}
+              data-slug={heading.slug}
+              class:list={[
+                "block py-px leading-tight text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white aria-[current=true]:font-semibold aria-[current=true]:text-black dark:aria-[current=true]:text-white transition-colors duration-200",
+                heading.depth === 2 ? "pl-3" : "pl-6 text-xs",
+              ]}
+            >
+              {heading.text}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</nav>
+
+<script>
+  function initToc() {
+    const navs = Array.from(document.querySelectorAll<HTMLElement>(".toc"));
+    if (navs.length === 0) return;
+
+    const slugs = Array.from(navs[0].querySelectorAll<HTMLAnchorElement>("a[data-slug]")).map(
+      (link) => link.dataset.slug ?? "",
+    );
+    const targets = slugs
+      .map((slug) => document.getElementById(slug))
+      .filter((el): el is HTMLElement => el !== null);
+    if (targets.length === 0) return;
+
+    function update() {
+      // Last heading that has scrolled past the top of the viewport (below the fixed header)
+      let current = targets[0];
+      for (const target of targets) {
+        if (target.getBoundingClientRect().top <= 120) current = target;
+      }
+
+      for (const nav of navs) {
+        const bar = nav.querySelector<HTMLElement>(".toc-bar");
+        for (const link of nav.querySelectorAll<HTMLAnchorElement>("a[data-slug]")) {
+          const isActive = link.dataset.slug === current.id;
+          if (isActive) link.setAttribute("aria-current", "true");
+          else link.removeAttribute("aria-current");
+          if (isActive && bar && link.offsetHeight > 0) {
+            bar.style.top = `${link.offsetTop}px`;
+            bar.style.height = `${link.offsetHeight}px`;
+            bar.style.opacity = "1";
+          }
+        }
+      }
+    }
+
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    // The collapsed mobile list has no size until it is opened
+    navs.forEach((nav) => nav.closest("details")?.addEventListener("toggle", update));
+    document.addEventListener(
+      "astro:before-swap",
+      () => {
+        window.removeEventListener("scroll", update);
+        window.removeEventListener("resize", update);
+      },
+      { once: true },
+    );
+  }
+
+  document.addEventListener("astro:page-load", initToc);
+</script>
